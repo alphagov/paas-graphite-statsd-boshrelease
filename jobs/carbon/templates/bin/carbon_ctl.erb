@@ -29,10 +29,19 @@ case $1 in
     rm -f /etc/cron.daily/prune_metrics
     <% end %>
 
+    <% if p('carbon.cache.log_to_syslog') %>
+    exec chpst -u vcap:vcap python /var/vcap/packages/carbon/bin/carbon-cache.py \
+      --config=/var/vcap/packages/carbon/conf/carbon.conf \
+      --debug \
+      start \
+      1> >(tee -a /var/vcap/sys/log/carbon/carbon.stdout.log | logger -t vcap.carbon.stdout ) \
+      2> >(tee -a /var/vcap/sys/log/carbon/carbon.stderr.log | logger -t vcap.carbon.stderr ) &
+    <% else %>
     exec chpst -u vcap:vcap python /var/vcap/packages/carbon/bin/carbon-cache.py \
       --config=/var/vcap/packages/carbon/conf/carbon.conf start \
       1>> /var/vcap/sys/log/carbon/carbon_ctl.stdout.log \
       2>> /var/vcap/sys/log/carbon/carbon_ctl.stderr.log
+    <% end %>
     ;;
 
   stop)
