@@ -50,7 +50,11 @@ WSGISocketPrefix run/wsgi
 </Files>
 
 LogLevel warn
+<% if p('graphite-web.log_to_syslog') %>
+ErrorLog "|$ tee -a /var/vcap/sys/log/graphite-web/default_httpd_error.log | logger -t vcap.graphite-web"
+<% else %>
 ErrorLog "/var/vcap/sys/log/graphite-web/default_httpd_error.log"
+<% end %>
 
 <IfModule log_config_module>
     LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
