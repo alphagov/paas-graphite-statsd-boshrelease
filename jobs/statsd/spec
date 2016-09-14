@@ -19,3 +19,6 @@ properties:
   statsd.carbon_cache_line_receiver_port:
     description: Port the carbon cache line receiver listens on.
     default: 2003
+  statsd.log_to_syslog:
+    description: Set this to True to enable logging to syslog.
+    default: False
