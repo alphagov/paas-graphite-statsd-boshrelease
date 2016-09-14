@@ -17,6 +17,18 @@ case $1 in
     chown -H vcap:vcap /var/vcap/sys/log/statsd
     chown -H vcap:vcap /var/vcap/sys/run/statsd
 
+<% if p('statsd.log_to_syslog') %>
+    start-stop-daemon --start --quiet -m \
+      --pidfile /var/vcap/sys/run/statsd/statsd.pid \
+      --startas /var/vcap/packages/node/bin/node \
+      --chuid vcap:vcap \
+      --background \
+      --no-close \
+      --chdir /var/vcap/packages/statsd \
+      -- /var/vcap/packages/statsd/stats.js /var/vcap/packages/statsd/localConfig.js \
+      1> >(tee -a /var/vcap/sys/log/statsd/statsd.stdout.log | logger -t vcap.statsd.stdout ) \
+      2> >(tee -a /var/vcap/sys/log/statsd/statsd.stderr.log | logger -t vcap.statsd.stderr )
+<% else %>
     start-stop-daemon --start --quiet -m \
       --pidfile /var/vcap/sys/run/statsd/statsd.pid \
       --startas /var/vcap/packages/node/bin/node \
@@ -27,6 +39,7 @@ case $1 in
       -- /var/vcap/packages/statsd/stats.js /var/vcap/packages/statsd/localConfig.js \
       1>> /var/vcap/sys/log/statsd/statsd_ctl.stdout.log \
       2>> /var/vcap/sys/log/statsd/statsd_ctl.stderr.log
+<% end %>
     ;;
 
   stop)

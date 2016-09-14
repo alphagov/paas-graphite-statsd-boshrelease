@@ -19,6 +19,9 @@ templates:
   config/whitelist.conf.erb: conf/whitelist.conf
 
 properties:
+  carbon.cache.log_to_syslog:
+    description: Set this to True to enable logging to syslog.
+    default: False
   carbon.cache.enable_log_rotation:
     description: Set this to True to enable daily log rotation.
     default: True
